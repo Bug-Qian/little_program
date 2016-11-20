@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>多级联动</title>
+	<script type="text/javascript" src="js/jquery-2.1.4/jquery.min.js"></script>
+	<script type="text/javascript">
+		$(function(){
+			//将每次获取数据的方法进行封装(也可以将方法封装在$(function(){})外面)
+			function getJson(url,callback){
+				var request=new XMLHttpRequest();
+				request.open("GET",url);
+				request.setRequestHeader("Content-Type","text/plain;charset=utf-8");
+				request.send();
+				request.onreadystatechange=function(){
+					if(request.readyState===4&&request.status===200){
+						var date=request.responseText;
+						callback(date);
+					}
+				}			
+			}
+
+			//第一步  文档树加载完成之后就加载年级数据
+			getJson("data/grade.json",function(date){
+				//将请求到的字符串数据转换为JSON格式数据,数组里存放每一个对象
+				var gradeJson=JSON.parse(date);
+				
+				gradeJson.forEach(function(item){
+					//遍历拿到每一个年级对象，进行字符串拼接，生成option标签，放在年级的select下面
+					var gradeOption="<option value='"+item.gradeId+"'>"+item.gradeName+"</option>";
+					$("#grade").append(gradeOption);
+				});
+			});
+
+			//第二步 给年级下拉列表添加监听change事件
+			$("#grade").change(function(){
+				//选中年级之后，移除班级disable属性
+				$("#clazz").attr("disabled",false);
+				//为了避免重复添加班级，每次年级改变时，需要将班级以及学生的下拉列表进行清空
+				$("#clazz").children(":not(:first)").remove();
+				$("#student").children(":not(:first)").remove();
+				//当年级改变时，去获取到所有的班级数据
+				getJson("data/clazz.json",function(clazz){
+					var clazzJson=JSON.parse(clazz);
+					//遍历班级数据，找到和当前选中年级相匹配的班级
+					var gradeId=$("#grade").val();
+					clazzJson.forEach(function(item){
+						if(gradeId==item.g_id){
+							var clazzOption="<option value='"+item.clazzId+"'>"+item.clazzName+"</option>";
+							$("#clazz").append(clazzOption);
+						}
+					});
+				});
+			});
+
+
+			//第三步 给班级下拉列表添加监听事件  同理
+			$("#clazz").change(function(){
+				$("#student").attr("disabled",false);
+				$("#student").children(":not(:first)").remove();
+				getJson("data/student.json",function(student){
+					var studentJson=JSON.parse(student);
+					//遍历班级数据，找到和当前选中年级相匹配的班级
+					var calzzId=$("#clazz").val();
+					studentJson.forEach(function(item){
+						if(calzzId==item.c_id){
+							var studentOption="<option value='"+item.studentId+"'>"+item.studentName+"</option>";
+							$("#student").append(studentOption);
+						}
+					});
+				});
+			});
+
+
+
+
+		});//结束标签
+	</script>
+</head>
+<body>
+	年级:
+	<select name="grade" id="grade">
+		<option value="">请选择</option>
+
+	</select>
+	班级:
+	<select name="clazz" id="clazz" disabled="disabled">
+		<option value="">请选择</option>
+	</select>
+	学生:
+	<select name="student" id="student" disabled="disabled">
+		<option value="">请选择</option>
+	</select>
+</body>
+</html>

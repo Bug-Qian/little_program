@@ -1,0 +1,184 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>表单过滤器</title>
+	<style type="text/css">	
+		table{width:100%;border-collapse: collapse;}
+		table td{border:1px solid #ccc;}
+		table td.l1{background-color: #ddd}
+		table td.msg{color: #f00;width:240px;}
+	</style>
+	<script type="text/javascript" src="js/jquery-2.1.4/jquery.min.js"></script>
+	<script type="text/javascript" src="js/ajax.js"></script>
+	<script type="text/javascript">
+		$(function(){
+
+			//声明全局对象，用来使用Ajax向后台提交
+			var obj={};
+
+			//用户名       失去焦点时进行检测，不能输入汉字
+			//方式1
+			$("input[name='username']").blur(function(){
+				var n=$("input[name='username']").val();
+				//声明正则对象  两种方式均可
+				//var n1=/^[a-z0-9_-]{6,}$/; 
+				var n1=/^\w{6,}$/;
+				if(n1.test(n)){	
+					$("#textUserName").html("");
+					
+					obj.username=n;
+				}else{
+					$("#textUserName").html("用户名不少于6个字符，不能包含特殊字符");
+				}
+				
+			});
+			
+			
+			//密码  同理
+			$("input[name='password']").blur(function(){
+				//失去焦点时进行检测
+				var p=$("input[name='password']").val();
+				var p1 =new RegExp(".{6,}");
+				if(!p1.test(p)){
+					$("#textPasswrd").html("密码不少于6个字符");
+				}else{
+					
+					$("#textPasswrd").html("");
+					obj.password=p;
+					
+				}
+				
+			});
+
+			//姓名
+			$("input[name='realname']").blur(function(){
+				//失去焦点时进行检测
+				var nn=$("input[name='realname']").val();
+				//var n2 =new RegExp("\\\S");
+				var n2 =/\S/;
+				if(n2.test(nn)){
+					$("#textName").html("");
+					obj.realname=nn;
+				}else{
+					$("#textName").html("姓名不能为空");
+				}
+			});
+
+
+			
+			
+
+			
+
+			//提交按钮绑定事件，进行Ajax提交
+			$("#sub").on("click",function(event){
+				//阻止默认提交(也可以将button按钮添加一个type属性)
+				//event.preventDefault();
+				//性别
+				var sex=$("input:checked").val();
+				obj.sex=sex;
+				//爱好
+				var like=[];
+				var checkedLike=$(":checkbox:checked");
+				checkedLike.each(function(index,item){
+					like.push($(item).val());
+				});
+				obj.like=like;
+				//地址
+				var address=$(":selected").val();
+				obj.address=address;
+				//文件
+				var file = $(":file").val();
+				obj.file=file;
+				//多行文本输入框
+				var $texts=$("textarea").val();
+				obj.texts=$texts;
+				//使用ajax进行提交表单
+				var request = new XMLHttpRequest();
+				request.open("POST","form-valide.html");
+				request.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+				//调用封装好的方法将obj对象进行编码向后台传输，该方法封装于js/ajax.js中
+				request.send(encodeFormData(obj));
+				console.log(obj);
+				console.log(encodeFormData(obj));
+			});
+		});
+
+	</script>
+</head>
+<body>
+<div style="width:600px; margin:0 auto;text-align:center" >
+	<h1>用户信息填写</h1>
+	<form name="userForm" action="register.action">
+	<table>
+	<tr>
+		<td class="l1">用户名：</td>
+		<td>
+			<input type="text" name="username"/>
+		</td>
+		<td class="msg" id="textUserName"><!-- 用户名不少于6个字符，不能包含特殊字符 --></td>
+	</tr>
+	<tr>
+		<td class="l1">密码：</td>
+		<td>
+			<input type="password" name="password"/>
+		</td>
+		<td class="msg" id="textPasswrd"><!-- 密码不少于6个字符 --></td>
+	</tr>
+	<tr>
+		<td class="l1">姓名：</td>
+		<td>
+			<input type="text" name="realname"/>
+		</td>
+		<td class="msg" id="textName"><!-- 不能为空 --></td>
+	<tr>
+	<tr>
+		<td class="l1">性别：</td>
+		<td colspan="2">
+			男<input type="radio" value="male" name="gender" checked="checked"> 
+			女<input type="radio" value="female" name="gender">
+		</td>
+	</tr>
+	<tr>
+		<td class="l1">爱好：</td>
+		<td colspan="2">
+			篮球<input type="checkbox" name="hobby" value="basketball"> 
+			足球 <input type="checkbox" name="hobby" value="football" checked="checked"> 
+			游泳<input type="checkbox" name="hobby" value="swimming"> 
+			跑步<input type="checkbox" name="hobby" value="run">
+		</td>
+	</tr>
+	<tr>
+		<td class="l1">地址：</td>
+		<td colspan="2">
+			<select name="address" id="address">
+				<option value="js">江苏</option>
+				<option value="sh">上海</option>
+				<option value="jx" selected="selected">江西</option>
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td class="l1">照片：</td>
+		<td colspan="2">
+			<input type="file" name="photo"/><br/>
+		</td>
+	</tr>
+	<tr>
+		<td class="l1">简介：</td>
+		<td colspan="2">
+			<textarea name="description" cols="30" rows="10">请输入您的基本信息</textarea>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="3">
+			<input type="submit" value="提交">
+			<button type="button" id="sub">提交</button>
+		</td>
+	</tr>
+	</table>
+	</form>
+</div>
+</body>
+</html>

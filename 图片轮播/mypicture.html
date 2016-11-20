@@ -1,0 +1,155 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>picture</title>
+	<style type="text/css">
+		*{
+			margin: 0px;
+			padding: 0px;
+		}
+		ul li{
+			list-style: none;
+		}
+		.left{
+			width: 200px;
+			height: 450px;
+			border: 1px solid #00f;
+			margin-left: 50px;
+			margin-top:40px;
+			padding-top: 20px;
+			float: left;
+		}
+		.left li{
+			width: 130px;
+			height: 130px;
+			margin: 0 auto 20px;
+		}
+		.left img{
+			width: 130px;
+			height: 130px;
+		}
+		.left li.current{
+			border: 3px solid black;
+		}
+		.right{
+			width: 460px;
+			height: 430px;
+			border: 1px solid #00f;
+			margin-left: 50px;
+			margin-top:40px;
+			padding: 20px;
+			float: left;
+			overflow: hidden;
+		}
+		.right li{
+			width: 460px;
+			height: 430px;
+			margin: 0 auto 20px;
+		}
+		.right img{
+			width: 460px;
+			height: 430px;
+		}
+		.right ul{
+			position: relative;
+			top: 0px;
+		}
+
+	</style>
+	<script type="text/javascript">
+		window.onload=function(){
+			var leftul=document.getElementById("leftul");
+			var leftlis=leftul.children;
+			var flag=0;
+			var rightul=document.getElementById("rightul");
+			var timeOut;
+			leftul.onmouseover=function(event){
+				var target=event.target;
+				//console.log(target);
+				if( target.nodeName=="IMG"){
+					//清除定时轮转
+					clearTimeout(timeOut);
+					//清除所有样式
+					Array.prototype.slice.call(leftlis,0).forEach(function(item){
+						//console.log(item);
+						item.removeAttribute("class");
+					});
+					//给当前(target)li设置样式
+					target.parentNode.setAttribute("class","current");
+
+					var index=target.parentNode.getAttribute("val");
+					//console.log(index);
+					flag=+index;//+转换成NAN类型(位置)
+					//console.log(flag);
+					//rightul.style.top=(-450*flag)+"px";
+					move(-450*flag);
+
+				}
+
+
+			};
+			//鼠标移出事件,执行定时轮转
+			leftul.onmouseout=function(event){
+				var target=event.target;
+				if(target.nodeName=="IMG"){
+					step();
+				}
+			};
+
+			//定时轮转函数
+			var step= function(){
+				//清除样式
+				leftlis[flag].className="";
+				if(flag>=leftlis.length-1){
+					flag=0;
+				}else{
+					flag=flag+1;
+				}
+				leftlis[flag].className="current";
+				timeOut=setTimeout(step,2000);
+				move(-450*flag);
+				
+			};
+			timeOut=setTimeout(step,2000);
+			//封装轮转函数
+			//参数：传入位置
+			function move(pos){
+				//m为了调用里面的方法（回调）
+				var m=function(){
+					//console.log(pos);
+				    var nowPos=parseInt(rightul.style.top,10);
+					var speed=60;
+					//Math.abs--取绝对值
+					if(Math.abs(nowPos-pos)>speed){
+						//((nowPos-pos)/Math.abs(nowPos-pos))--判断方向
+						nowPos -=((nowPos-pos)/Math.abs(nowPos-pos))*speed;
+						rightul.style.top=nowPos+"px";
+						setTimeout(m,20);
+					}else{
+						rightul.style.top=pos+"px";
+					}
+				};
+				setTimeout(m,20);
+			}
+		};
+	</script>
+</head>
+<body>
+	<div class="left">
+		<ul id="leftul">
+			<li class="current" val="0"><img src="images/a.jpg"/></li>
+			<li val="1"><img src="images/b.jpg"/></li>
+			<li val="2"><img src="images/c.jpg"/></li>
+		</ul>
+	</div>
+	<div class="right">
+		<ul id="rightul">
+			<li><img src="images/a.jpg"/></li>
+			<li><img src="images/b.jpg"/></li>
+			<li><img src="images/c.jpg"/></li>
+		</ul>
+	</div>
+	
+</body>
+</html>

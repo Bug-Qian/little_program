@@ -1,0 +1,29 @@
+[{
+	"clazzId":"2001",
+	"clazzName":"一年一班",
+	"g_id":"1001"
+},{
+	"clazzId":"2002",
+	"clazzName":"一年二班",
+	"g_id":"1001"
+},{
+	"clazzId":"2003",
+	"clazzName":"二年一班",
+	"g_id":"1002"
+},{
+	"clazzId":"2004",
+	"clazzName":"二年二班",
+	"g_id":"1002"
+},{
+	"clazzId":"2005",
+	"clazzName":"二年三班",
+	"g_id":"1002"
+},{
+	"clazzId":"2006",
+	"clazzName":"三年一班",
+	"g_id":"1003"
+},{
+	"clazzId":"2007",
+	"clazzName":"三年二班",
+	"g_id":"1003"
+}]
